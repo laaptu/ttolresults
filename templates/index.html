@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>DrawResult Winning Numbers Visualization</title>
+    <style>
+        /* Include necessary CSS styles */
+    </style>
+</head>
+<body>
+    <h1>DrawResult Winning Numbers Visualization</h1>
+    <svg id="chart"></svg>
+
+    <script src="https://d3js.org/d3.v7.min.js"></script>
+    <script>
+        // Access the passed data
+        var numbers = {{ numbers|tojson }};
+
+        // Set up the chart dimensions
+        var margin = {top: 20, right: 20, bottom: 30, left: 40};
+        var width = 800 - margin.left - margin.right;
+        var height = 400 - margin.top - margin.bottom;
+
+        // Create the SVG container
+        var svg = d3.select("#chart")
+                    .attr("width", width + margin.left + margin.right)
+                    .attr("height", height + margin.top + margin.bottom)
+                    .append("g")
+                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        // Set up the x and y scales
+        var x = d3.scaleBand()
+                  .domain(numbers.map(function(d) { return d[0]; }))
+                  .range([0, width])
+                  .padding(0.1);
+
+        var y = d3.scaleLinear()
+                  .domain([0, d3.max(numbers, function(d) { return d[1]; })])
+                  .range([height, 0]);
+
+        // Create the bars
+        svg.selectAll(".bar")
+           .data(numbers)
+           .enter().append("rect")
+           .attr("class", "bar")
+           .attr("x", function(d) { return x(d[0]); })
+           .attr("width", x.bandwidth())
+           .attr("y", function(d) { return y(d[1]); })
+           .attr("height", function(d) { return height - y(d[1]); });
+
+        // Add x-axis
+        svg.append("g")
+           .attr("transform", "translate(0," + height + ")")
+           .call(d3.axisBottom(x));
+
+        // Add y-axis
+        svg.append("g")
+           .call(d3.axisLeft(y));
+
+    </script>
+</body>
+</html>
