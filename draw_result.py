@@ -11,3 +11,11 @@ class DrawResult:
         print("Primary Numbers:", self.primary_numbers)
         print("Secondary Numbers:", self.secondary_numbers)
         print()
+
+    def to_dict(self):
+        return {
+            'draw_number': self.draw_number,
+            'draw_date': self.draw_date,
+            'primary_numbers': list(self.primary_numbers),
+            'secondary_numbers': list(self.secondary_numbers)
+        }

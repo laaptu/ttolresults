@@ -35,7 +35,7 @@ def index():
     print(len(draw_results))
     print(len(sorted_numbers))
     # Pass the processed data to the HTML template
-    return render_template('index-by-day.html', numbers=sorted_numbers, selected_day=selected_day)
+    return render_template('chart-day.html', numbers=sorted_numbers, selected_day=selected_day)
 
 if __name__ == '__main__':
     app.run()
