@@ -1,26 +1,29 @@
 import requests
-from datetime import datetime
+from datetime import datetime, timedelta
 from calendar import monthrange
 
 from db_connector import DBConnector
 from draw_result import DrawResult
 from frequency import Frequency
+from lott import Lott
 
 
-def get_draw_results(date, frequency=Frequency.MONTHLY):
+def get_draw_results(date, frequency=Frequency.MONTHLY, lott = Lott.MON_WED):
     if frequency == Frequency.DAILY:
         date_start = date.replace(hour=14, minute=0, second=0, microsecond=0).isoformat() + 'Z'
         date_end = date.replace(hour=13, minute=59, second=59, microsecond=0).isoformat() + 'Z'
     else:
         _, last_day = monthrange(date.year, date.month)
-        date_start = date.replace(day=1, hour=14, minute=0, second=0, microsecond=0).isoformat() + 'Z'
+        first_day = date.replace(day =1)
+        previous_month_day = first_day - timedelta(days=1)
+        date_start = previous_month_day.replace(hour=14, minute=0, second=0, microsecond=0).isoformat() + 'Z'
         date_end = date.replace(day=last_day, hour=13, minute=59, second=59, microsecond=0).isoformat() + 'Z'
 
     url = "https://data.api.thelott.com/sales/vmax/web/data/lotto/results/search/daterange"
     payload = {
         "DateStart": date_start,
         "DateEnd": date_end,
-        "ProductFilter": ["MonWedLotto"],
+        "ProductFilter": [lott.value],
         "CompanyFilter": ["Tattersalls"]
     }
     response = requests.post(url, json=payload)
