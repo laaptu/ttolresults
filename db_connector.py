@@ -41,7 +41,7 @@ class DBConnector:
         conn = sqlite3.connect(self.db_name)
         cursor = conn.cursor()
 
-        table_name = get_table_name(lott)
+        table_name = self.get_table_name(lott)
         cursor.execute(f'SELECT * FROM {table_name} ORDER BY draw_date DESC')
         rows = cursor.fetchall()
 

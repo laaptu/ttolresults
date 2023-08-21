@@ -1,61 +1,29 @@
+
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>DrawResult Winning Numbers Visualization</title>
-    <style>
-        /* Include necessary CSS styles */
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lott Results Viewer</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+    <link rel="stylesheet" href="/static/styles/styles.css">
 </head>
 <body>
-    <h1>DrawResult Winning Numbers Visualization</h1>
-    <svg id="chart"></svg>
+    <h1>Select a Lott Type</h1>
+    <select id="lottSelect">
+        <!-- Options will be populated using JavaScript -->
+    </select>
+    <button onclick="fetchResults()">Fetch Results</button>
 
-    <script src="https://d3js.org/d3.v7.min.js"></script>
-    <script>
-        // Access the passed data
-        var numbers = {{ numbers|tojson }};
+    <h2>Unique Days</h2>
+    <div id="uniqueDays"></div>
 
-        // Set up the chart dimensions
-        var margin = {top: 20, right: 20, bottom: 30, left: 40};
-        var width = 800 - margin.left - margin.right;
-        var height = 400 - margin.top - margin.bottom;
-
-        // Create the SVG container
-        var svg = d3.select("#chart")
-                    .attr("width", width + margin.left + margin.right)
-                    .attr("height", height + margin.top + margin.bottom)
-                    .append("g")
-                    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-        // Set up the x and y scales
-        var x = d3.scaleBand()
-                  .domain(numbers.map(function(d) { return d[0]; }))
-                  .range([0, width])
-                  .padding(0.1);
-
-        var y = d3.scaleLinear()
-                  .domain([0, d3.max(numbers, function(d) { return d[1]; })])
-                  .range([height, 0]);
-
-        // Create the bars
-        svg.selectAll(".bar")
-           .data(numbers)
-           .enter().append("rect")
-           .attr("class", "bar")
-           .attr("x", function(d) { return x(d[0]); })
-           .attr("width", x.bandwidth())
-           .attr("y", function(d) { return y(d[1]); })
-           .attr("height", function(d) { return height - y(d[1]); });
-
-        // Add x-axis
-        svg.append("g")
-           .attr("transform", "translate(0," + height + ")")
-           .call(d3.axisBottom(x));
-
-        // Add y-axis
-        svg.append("g")
-           .call(d3.axisLeft(y));
-
-    </script>
+    <h2>Graphs</h2>
+    <canvas id="Primary Numbers" width="400" height="200"></canvas>
+    <canvas id="Secondary Numbers" width="400" height="200"></canvas>
+    <canvas id="Primary+Secondary Numbers" width="400" height="200"></canvas>
+    <script src="/static/scripts/chartWrapper.js"></script>
+    <script src="/static/scripts/scripts.js"></script>
 </body>
 </html>
