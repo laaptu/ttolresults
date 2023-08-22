@@ -32,42 +32,48 @@ function fetchResults() {
     fetch(`/results/${selectedLott}`)
     .then(response => response.json())
     .then(results => {
-        displayUniqueDays(results);
-        renderGraphs(results);
+        occurrences = results.response.occurrences
+        days = results.response.days
+        displayUniqueDays(days, (day) => {
+            const dayData = occurrences.find(occ => occ.day === day);
+            renderGraphs(dayData);
+        });
+        //renderGraphs(occurences);
     });
 }
 
 // Display unique days based on the fetched results
-function displayUniqueDays(results) {
-    const uniqueDays = [...new Set(results.map(result => new Date(result.draw_date).getDay()))];
-    const dayNames = ["Sunday", "Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday"];
-    const daysDiv = document.getElementById('uniqueDays');
-    daysDiv.textContent = uniqueDays.map(dayIndex => dayNames[dayIndex]).join(', ');
+function displayUniqueDays(days, callback) {
+    const container = document.getElementById('uniqueDaysContainer');
+    container.innerHTML = ''; // Clear any previous content
+
+    days.forEach(day => {
+        const radio = document.createElement('input');
+        radio.type = 'radio';
+        radio.name = 'day';
+        radio.value = day;
+        radio.id = `radio-${day}`;
+        radio.addEventListener('change', (event) => callback(day));
+
+        const label = document.createElement('label');
+        label.htmlFor = `radio-${day}`;
+        label.textContent = day;
+
+        container.appendChild(radio);
+        container.appendChild(label);
+        if(day == 'All'){
+            radio.checked = true
+            callback(day)
+       }
+    });
 }
 
-function getNumberOccurrences(numbers) {
-    let occurrences = {};
-    numbers.forEach(number => {
-        occurrences[number] = (occurrences[number] || 0) + 1;
-    });
-    const sortedNumbers = Object.keys(occurrences).sort((a, b) => occurrences[b] - occurrences[a]);
-    const sortedOccurrences = sortedNumbers.map(number => occurrences[number]);
-    return { numbers: sortedNumbers, occurrences: sortedOccurrences };
-}
 
 // Render bar graphs using Chart.js based on the fetched results
-function renderGraphs(results) {
-    // Extract and process data for primary numbers, secondary numbers, and combined numbers
-    const primaryNumbers = results.flatMap(result => result.primary_numbers);
-    const secondaryNumbers = results.flatMap(result => result.secondary_numbers);
-    
-    const primaryOccurrences = getNumberOccurrences(primaryNumbers);
-    const secondaryOccurrences = getNumberOccurrences(secondaryNumbers);
-    const combinedOccurrences = getNumberOccurrences([...primaryNumbers, ...secondaryNumbers]);
-
-    primaryChart.refresh(primaryOccurrences);
-    secondaryChart.refresh(secondaryOccurrences);
-    combinedChart.refresh(combinedOccurrences);
+function renderGraphs(occurences) {
+    primaryChart.refresh(occurences.primaryNumOcc);
+    secondaryChart.refresh(occurences.secondaryNumOcc);
+    combinedChart.refresh(occurences.combinedNumOcc);
 }
 
 // Initial call to populate the Lott dropdown

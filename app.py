@@ -4,6 +4,7 @@ import sqlite3
 from datetime import datetime
 from lott import Lott
 from db_connector import DBConnector
+from lott_result_fetcher import fetch_lott_results
 
 app = Flask(__name__)
 
@@ -17,11 +18,7 @@ def lott_types():
 
 @app.route('/results/<lott_type>')
 def get_results(lott_type):
-    lott_enum = Lott(lott_type)
-    db_connector = DBConnector()
-    results = db_connector.get_all_draw_results(lott_enum)
-    results_dict = [result.to_dict() for result in results]
-    return jsonify(results_dict)
+    return fetch_lott_results(lott_type)
 
 @app.route('/days')
 def get_days():
